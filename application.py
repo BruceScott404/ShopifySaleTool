@@ -14,9 +14,23 @@ def remove_sale():
     data['Variant Compare At Price'] = ''
     data.to_csv("output/output.csv", index=False)
 
-print("Shopify Sale Tool\n1) Add a sale\n2) Remove a sale")
+def set_prices():
+    filename = input("Enter pricing filename: ")
+    pricing_data = pd.read_csv(filename, header=0)
+    price_dict = {}
+    for index, row in pricing_data.iterrows():
+        price_dict[row['sku']] = row['price']
+    
+    for index, row in data.iterrows():
+        if row['Variant SKU'] in price_dict and not(row['Title'] == ''):
+            print("Found")
+            data.at[index, 'Variant Price'] = price_dict[row['Variant SKU']]
+    
+    data.to_csv("output/output.csv", index=False)
+
+print("Shopify Sale Tool\n1) Add a sale\n2) Remove a sale\n3) Change prices in bulk")
 choice = 0
-while choice < 1 or choice > 2:
+while choice < 1 or choice > 3:
     try:
         choice = int(input("Choice: "))
     except:
@@ -24,7 +38,9 @@ while choice < 1 or choice > 2:
 
 if choice == 1:
     add_sale()
-else:
+elif choice == 2:
     remove_sale()
+else:
+    set_prices()
 
 print("Complete")
